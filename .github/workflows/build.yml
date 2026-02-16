@@ -13,8 +13,31 @@ jobs:
       
       - name: Clone tingshu
         run: git clone https://github.com/eprendre/tingshu.git /tmp/tingshu
-        
-      - name: Build JAR
+      
+      - name: Create source files from base64
+        run: |
+          mkdir -p src/main/kotlin/com/github/gncysy/tingshu
+          
+          # LeTing8Source.kt (base64编码)
+          echo 'cGFja2FnZSBjb20uZ2l0aHViLmduY3lzeS50aW5nc2h1CgppbXBvcnQgY29tLmdpdGh1Yi5lcHJlbmRyZS50aW5nc2h1LmNvcmUuVGluZ1NodQppbXBvcnQgY29tLmdpdGh1Yi5lcHJlbmRyZS50aW5nc2h1LnBvam8uQm9vawppbXBvcnQgY29tLmdpdGh1Yi5lcHJlbmRyZS50aW5nc2h1LnBvam8uQ2F0ZWdvcnkKaW1wb3J0IGNvbS5naXRodWIuZXByZW5kcmUudGluZ3NodS5wb2pvLkNhdGVnb3J5TWVudQppbXBvcnQgY29tLmdpdGh1Yi5lcHJlbmRyZS50aW5nc2h1LnBvam8uQ2F0ZWdvcnlUYWIKaW1wb3J0IGNvbS5naXRodWIuZXByZW5kcmUudGluZ3NodS5wb2pvLkVwaXNvZGUKaW1wb3J0IG9yZy5qc291cC5Kc291cAppbXBvcnQgamF2YS5uZXQuVVJMRW5jb2RlcgoKY2xhc3MgTGVUaW5nOFNvdXJjZSA6IFRpbmdTaHUoKSB7CiAgICAKICAgIG92ZXJyaWRlIGZ1biBnZXRTb3VyY2VOYW1lKCk6IFN0cmluZyB7CiAgICAgICAgcmV0dXJuICLnvZHnu5zlvaIiCiAgICB9CiAgICAKICAgIG92ZXJyaWRlIGZ1biBnZXREZXNjKCk6IFN0cmluZyB7CiAgICAgICAgcmV0dXJuICLnvZHnu5zlvaIgLSBsZXRpbmc4LmNvbSIKICAgIH0KICAgIAogICAgb3ZlcnJpZGUgZnVuIGdldENhdGVnb3J5TWVudXMoKTogTGlzdDxDYXRlZ29yeU1lbnU+IHsKICAgICAgICB2YWwgbGlzdCA9IGxpc3RPZigKICAgICAgICAgICAgIlh4IiB0byAieHVhbmh1YW4iLAogICAgICAgICAgICAi55Sf5LqnIiB0byAieWFucWluZyIsCiAgICAgICAgICAgICLlnq/nlKMiIHRvICJkdXNoaSIKICAgICAgICApCiAgICAgICAgcmV0dXJuIGxpc3QubWFwIHsgKG5hbWUsIGNvZGUpIC0+CiAgICAgICAgICAgIENhdGVnb3J5TWVudShuYW1lLCBsaXN0T2YoCiAgICAgICAgICAgICAgICBDYXRlZ29yeVRhYigi5pyA5pawIiwgImh0dHBzOi8vd3d3LmxldGluZzguY29tLyRjb2RlLyIpLAogICAgICAgICAgICAgICAgQ2F0ZWdvcnlUYWIoIuW4uOeUtyIsICJodHRwczovL3d3dy5sZXRpbmc4LmNvbS8kY29kZS9ob3QvIikKICAgICAgICAgICAgKSkKICAgICAgICB9CiAgICB9CiAgICAKICAgIG92ZXJyaWRlIGZ1biBnZXRDYXRlZ29yeUxpc3QodXJsOiBTdHJpbmcpOiBDYXRlZ29yeSB7CiAgICAgICAgdmFsIGRvYyA9IEpzb3VwLmNvbm5lY3QodXJsKS51c2VyQWdlbnQoIk1vemlsbGEvNS4wIikuZ2V0KCkKICAgICAgICB2YWwgYm9va3MgPSBkb2Muc2VsZWN0KCJkaXYuaXRlbSIpLm1hcCB7IGl0ZW0gLT4KICAgICAgICAgICAgdmFsIGEgPSBpdGVtLnNlbGVjdEZpcnN0KCJoMyBhIikhCiAgICAgICAgICAgIEJvb2soCiAgICAgICAgICAgICAgICBjb3ZlclVybCA9IGl0ZW0uc2VsZWN0Rmlyc3QoImltZyIpPy5hdHRyKCJzcmMiKSA/OiAiIiwKICAgICAgICAgICAgICAgIHRpdGxlID0gYS50ZXh0KCksCiAgICAgICAgICAgICAgICBhdXRob3IgPSBpdGVtLnNlbGVjdEZpcnN0KCIuYXV0aG9yIik/LnRleHQoKSA/OiAiIiwKICAgICAgICAgICAgICAgIGludHJvID0gaXRlbS5zZWxlY3RGaXJzdCgiLmRlc2MiKT8udGV4dCgpID86ICIiLAogICAgICAgICAgICAgICAgYm9va1VybCA9ICJodHRwczovL3d3dy5sZXRpbmc4LmNvbSIgKyBhLmF0dHIoImhyZWYiKQogICAgICAgICAgICApCiAgICAgICAgfQogICAgICAgIHZhbCBuZXh0ID0gZG9jLnNlbGVjdEZpcnN0KCJhLm5leHQiKT8uYXR0cigiaHJlZiIpID86ICIiCiAgICAgICAgcmV0dXJuIENhdGVnb3J5KGJvb2tzLCBpZiAobmV4dC5pc05vdEVtcHR5KCkpICJodHRwczovL3d3dy5sZXRpbmc4LmNvbSRuZXh0IiBlbHNlICIiKQogICAgfQogICAgCiAgICBvdmVycmlkZSBmdW4gc2VhcmNoKGtleXdvcmRzOiBTdHJpbmcsIHBhZ2U6IEludCk6IExpc3Q8Qm9vaz4gewogICAgICAgIHZhbCB1cmwgPSAiaHR0cHM6Ly93d3cubGV0aW5nOC5jb20vc2VhcmNoLnBocD9xPSR7VVJMRW5jb2Rlci5lbmNvZGUoa2V5d29yZHMsICJVVEYtOCIpfSZwYWdlPSRwYWdlIgogICAgICAgIHJldHVybiBnZXRDYXRlZ29yeUxpc3QodXJsKS5saXN0CiAgICB9CiAgICAKICAgIG92ZXJyaWRlIGZ1biBnZXRCb29rRGV0YWlsSW5mbyhib29rVXJsOiBTdHJpbmcpOiBCb29rIHsKICAgICAgICB2YWwgZG9jID0gSnNvdXAuY29ubmVjdChib29rVXJsKS51c2VyQWdlbnQoIk1vemlsbGEvNS4wIikuZ2V0KCkKICAgICAgICB2YWwgZXBpc29kZXMgPSBkb2Muc2VsZWN0KCIuY2hhcHRlci1saXN0IGEiKS5tYXBJbmRleGVkIHsgaSwgYSAtPgogICAgICAgICAgICBFcGlzb2RlKGksIGEudGV4dCgpLCAiaHR0cHM6Ly93d3cubGV0aW5nOC5jb20iICsgYS5hdHRyKCJocmVmIikpCiAgICAgICAgfQogICAgICAgIHJldHVybiBCb29rKAogICAgICAgICAgICB0aXRsZSA9IGRvYy5zZWxlY3RGaXJzdCgiaDEiKT8udGV4dCgpID86ICIiLAogICAgICAgICAgICBjb3ZlclVybCA9IGRvYy5zZWxlY3RGaXJzdCgiLmJvb2staW1nIGltZyIpPy5hdHRyKCJzcmMiKSA/OiAiIiwKICAgICAgICAgICAgYXV0aG9yID0gZG9jLnNlbGVjdEZpcnN0KCIuaW5mbzpjb250YWlucyjnvJHnkIknKSI/LnRleHQoKT8ucmVwbGFjZSjnvJHnkIknLCAnJykgPzogIiIsCiAgICAgICAgICAgIGludHJvID0gZG9jLnNlbGVjdEZpcnN0KCIuYm9vay1kZXNjIik/LnRleHQoKSA/OiAiIiwKICAgICAgICAgICAgZXBpc29kZXMgPSBlcGlzb2RlcywKICAgICAgICAgICAgYm9va1VybCA9IGJvb2tVcmwKICAgICAgICApCiAgICB9CiAgICAKICAgIG92ZXJyaWRlIGZ1biBnZXRBdWRpb1VybEV4dHJhY3RvcigpID0gY29tLmdpdGh1Yi5lcHJlbmRyZS50aW5nc2h1LmNvcmUuQXVkaW9VcmxFeHRyYWN0b3IgeyB1cmwgLT4KICAgICAgICB2YWwgZG9jID0gSnNvdXAuY29ubmVjdCh1cmwpLnVzZXJBZ2VudCgiTW96aWxsYS81LjAiKS5nZXQoKQogICAgICAgIGRvYy5zZWxlY3RGaXJzdCgiYXVkaW8gc291cmNlIik/LmF0dHIoInNyYyIpID86IGRvYy5zZWxlY3RGaXJzdCgiW2RhdGEtYXVkaW9dIik/LmF0dHIoImRhdGEtYXVkaW8iKSA/OiAiIgogICAgfQogICAgCiAgICBvdmVycmlkZSBmdW4gaXNEaXNjb3ZlcmFibGUoKTogQm9vbGVhbiA9IHRydWUKICAgIG92ZXJyaWRlIGZ1biBpc1NlYXJjaGFibGUoKTogQm9vbGVhbiA9IHRydWUKfQ==' | base64 -d > src/main/kotlin/com/github/gncysy/tingshu/LeTing8Source.kt
+          
+          # SourceEntry.kt (base64编码)
+          echo 'cGFja2FnZSBjb20uZ2l0aHViLmduY3lzeS50aW5nc2h1CgppbXBvcnQgY29tLmdpdGh1Yi5lcHJlbmRyZS50aW5nc2h1LmNvcmUuU291cmNlRW50cnkKaW1wb3J0IGNvbS5naXRodWIuZXByZW5kcmUudGluZ3NodS5jb3JlLlRpbmdTaHUKCmNsYXNzIFNvdXJjZUVudHJ5IDogU291cmNlRW50cnkgewogICAgb3ZlcnJpZGUgZnVuIGdldFNvdXJjZXMoKTogTGlzdDxUaW5nU2h1PiB7CiAgICAgICAgcmV0dXJuIGxpc3RPZihMZVRpbmc4U291cmNlKCkpCiAgICB9Cn0=' | base64 -d > src/main/kotlin/com/github/gncysy/tingshu/SourceEntry.kt
+      
+      - name: Check files
+        run: |
+          echo "=== LeTing8Source.kt ==="
+          head -5 src/main/kotlin/com/github/gncysy/tingshu/LeTing8Source.kt
+          echo "=== SourceEntry.kt ==="
+          cat src/main/kotlin/com/github/gncysy/tingshu/SourceEntry.kt
+      
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '18'
+          distribution: 'temurin'
+      
+      - name: Build in tingshu project
         run: |
           cd /tmp/tingshu/CustomSources
           rm -rf src/main/kotlin/com/github/eprendre/sources_by_eprendre
@@ -24,28 +47,7 @@ jobs:
           chmod +x gradlew
           ./gradlew jar
           cp build/libs/sources_by_gncysy.jar $GITHUB_WORKSPACE/
-          
-      - name: Commit JAR
-        run: |
-          git config user.email "action@github.com"
-          git config user.name "GitHub Action"
-          git add sources_by_gncysy.jar
-          git commit -m "Build JAR" || exit 0
-          git push
-          java-version: '18'
-          distribution: 'temurin'
-          
-      - name: Build JAR
-        run: |
-          cd /tmp/tingshu/CustomSources
-          rm -rf src/main/kotlin/com/github/eprendre/sources_by_eprendre
-          mkdir -p src/main/kotlin/com/github/gncysy/tingshu
-          cp $GITHUB_WORKSPACE/src/main/kotlin/com/github/gncysy/tingshu/* src/main/kotlin/com/github/gncysy/tingshu/
-          echo "MY_SOURCES_PACKAGE=sources_by_gncysy" > gradle.properties
-          chmod +x gradlew
-          ./gradlew jar
-          cp build/libs/sources_by_gncysy.jar $GITHUB_WORKSPACE/
-          
+      
       - name: Commit JAR
         run: |
           git config user.email "action@github.com"
