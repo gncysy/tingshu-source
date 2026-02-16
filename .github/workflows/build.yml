@@ -8,32 +8,112 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Clone tingshu repo
-      run: git clone https://github.com/eprendre/tingshu.git /tmp/tingshu
+      - uses: actions/checkout@v3
       
-    - name: Setup source files
-      run: |
-        mkdir -p src/main/kotlin/com/github/gncysy/tingshu
-        cp /tmp/tingshu/CustomSources/build.gradle .
-        cp /tmp/tingshu/CustomSources/settings.gradle .
-        cp /tmp/tingshu/CustomSources/gradle.properties .
-        sed -i 's/sources_by_eprendre/sources_by_gncysy/g' gradle.properties
+      - name: Clone tingshu
+        run: git clone https://github.com/eprendre/tingshu.git /tmp/tingshu
         
-    - name: Create source files
-      run: |
-        cat > src/main/kotlin/com/github/gncysy/tingshu/LeTing8Source.kt << 'EOF'
-package com.github.gncysy.tingshu
+      - name: Create source files
+        run: |
+          mkdir -p src/main/kotlin/com/github/gncysy/tingshu
+          
+          echo 'package com.github.gncysy.tingshu
+          import com.github.eprendre.tingshu.core.TingShu
+          import com.github.eprendre.tingshu.pojo.*
+          import org.jsoup.Jsoup
+          import java.net.URLEncoder
+          
+          class LeTing8Source : TingShu() {
+              override fun getSourceName() = "乐听吧"
+              override fun getDesc() = "在线听书 - leting8.com"
+              
+              override fun getCategoryMenus(): List<CategoryMenu> {
+                  val list = listOf("玄幻" to "xuanhuan", "言情" to "yanqing", "都市" to "dushi")
+                  return list.map { (name, code) ->
+                      CategoryMenu(name, listOf(
+                          CategoryTab("最新", "https://www.leting8.com/$code/"),
+                          CategoryTab("热门", "https://www.leting8.com/$code/hot/")
+                      ))
+                  }
+              }
+              
+              override fun getCategoryList(url: String): Category {
+                  val doc = Jsoup.connect(url).userAgent("Mozilla/5.0").get()
+                  val books = doc.select("div.item").map { item ->
+                      val a = item.selectFirst("h3 a")!!
+                      Book(
+                          coverUrl = item.selectFirst("img")?.attr("src") ?: "",
+                          title = a.text(),
+                          author = item.selectFirst(".author")?.text() ?: "",
+                          intro = item.selectFirst(".desc")?.text() ?: "",
+                          bookUrl = "https://www.leting8.com" + a.attr("href")
+                      )
+                  }
+                  val next = doc.selectFirst("a.next")?.attr("href") ?: ""
+                  return Category(books, if (next.isNotEmpty()) "https://www.leting8.com$next" else "")
+              }
+              
+              override fun search(keywords: String, page: Int): List<Book> {
+                  val url = "https://www.leting8.com/search.php?q=${URLEncoder.encode(keywords, "UTF-8")}&page=$page"
+                  return getCategoryList(url).list
+              }
+              
+              override fun getBookDetailInfo(bookUrl: String): Book {
+                  val doc = Jsoup.connect(bookUrl).userAgent("Mozilla/5.0").get()
+                  val episodes = doc.select(".chapter-list a").mapIndexed { i, a ->
+                      Episode(i, a.text(), "https://www.leting8.com" + a.attr("href"))
+                  }
+                  return Book(
+                      title = doc.selectFirst("h1")?.text() ?: "",
+                      coverUrl = doc.selectFirst(".book-img img")?.attr("src") ?: "",
+                      author = doc.selectFirst(".info:contains(作者)")?.text()?.replace("作者：", "") ?: "",
+                      intro = doc.selectFirst(".book-desc")?.text() ?: "",
+                      episodes = episodes,
+                      bookUrl = bookUrl
+                  )
+              }
+              
+              override fun getAudioUrlExtractor() = com.github.eprendre.tingshu.core.AudioUrlExtractor { url ->
+                  val doc = Jsoup.connect(url).userAgent("Mozilla/5.0").get()
+                  doc.selectFirst("audio source")?.attr("src") ?: doc.selectFirst("[data-audio]")?.attr("data-audio") ?: ""
+              }
+              
+              override fun isDiscoverable() = true
+              override fun isSearchable() = true
+          }' > src/main/kotlin/com/github/gncysy/tingshu/LeTing8Source.kt
+          
+          echo 'package com.github.gncysy.tingshu
+          import com.github.eprendre.tingshu.core.SourceEntry
+          import com.github.eprendre.tingshu.core.TingShu
+          class SourceEntry : SourceEntry {
+              override fun getSources(): List<TingShu> = listOf(LeTing8Source())
+          }' > src/main/kotlin/com/github/gncysy/tingshu/SourceEntry.kt
 
-import com.github.eprendre.tingshu.core.TingShu
-import com.github.eprendre.tingshu.pojo.*
-import org.jsoup.Jsoup
-import java.net.URLEncoder
-
-class LeTing8Source : TingShu() {
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '18'
+          distribution: 'temurin'
+          
+      - name: Build JAR
+        run: |
+          cd /tmp/tingshu/CustomSources
+          rm -rf src/main/kotlin/com/github/eprendre/sources_by_eprendre
+          mkdir -p src/main/kotlin/com/github/gncysy/tingshu
+          cp $GITHUB_WORKSPACE/src/main/kotlin/com/github/gncysy/tingshu/* src/main/kotlin/com/github/gncysy/tingshu/
+          echo "MY_SOURCES_PACKAGE=sources_by_gncysy" > gradle.properties
+          chmod +x gradlew
+          ./gradlew jar
+          cp build/libs/sources_by_gncysy.jar $GITHUB_WORKSPACE/
+          
+      - name: Commit JAR
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+          git add sources_by_gncysy.jar
+          git commit -m "Build JAR" || exit 0
+          git push
     
     override fun getSourceName() = "乐听吧"
     override fun getDesc() = "在线听书 - leting8.com"
